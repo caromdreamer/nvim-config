@@ -64,14 +64,17 @@ return require("packer").startup(function(use)
 		require("telescope").setup({})
 	end})
 	use("nvim-lua/plenary.nvim")
-	use({"hoob3rt/lualine.nvim", 
-	config = function()
-
+	use({"hoob3rt/lualine.nvim", config = function()
 		-- Lualine
 		require("lualine").setup({
 			options = { theme = "gruvbox" },
 		})
 	end})
+	use({'ray-x/go.nvim', config = function() 
+		vim.api.nvim_exec([[ autocmd BufWritePre *.go :silent! lua require('go.format').gofumpt() ]], false)
+		require('go').setup()
+	end})
+
 	use("nvim-treesitter/nvim-treesitter")
 	use({"lewis6991/gitsigns.nvim", config = function()
 		require("gitsigns").setup()
