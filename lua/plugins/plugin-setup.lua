@@ -64,6 +64,26 @@ return require("packer").startup(function(use)
 		require("telescope").setup({})
 	end})
 	use("nvim-lua/plenary.nvim")
+	use({
+		"akinsho/toggleterm.nvim",
+		tag = "*",
+		config = function()
+			require("toggleterm").setup({
+				size = function(term)
+					if term.direction == "horizontal" then
+						return 12
+					end
+					if term.direction == "vertical" then
+						return math.floor(vim.o.columns * 0.38)
+					end
+					return 20
+				end,
+				start_in_insert = true,
+				shade_terminals = true,
+				float_opts = { border = "curved", winblend = 0 },
+			})
+		end,
+	})
 	use({"hoob3rt/lualine.nvim", config = function()
 		-- Lualine
 		require("lualine").setup({
@@ -75,11 +95,52 @@ return require("packer").startup(function(use)
 		require('go').setup()
 	end})
 
-	use("nvim-treesitter/nvim-treesitter")
-	use({"lewis6991/gitsigns.nvim", config = function()
-		require("gitsigns").setup()
-	end})
-	use("ellisonleao/gruvbox.nvim")
+	use({
+		"nvim-treesitter/nvim-treesitter",
+		run = ":TSUpdate",
+		config = function()
+			require("nvim-treesitter.configs").setup({
+				highlight = { enable = true },
+				indent = { enable = true },
+			})
+		end,
+	})
+	use({
+		"lewis6991/gitsigns.nvim",
+		config = function()
+			require("gitsigns").setup({
+				on_attach = function(bufnr)
+					local gs = require("gitsigns")
+					vim.keymap.set("n", "]h", gs.next_hunk, { buffer = bufnr, desc = "다음 hunk" })
+					vim.keymap.set("n", "[h", gs.prev_hunk, { buffer = bufnr, desc = "이전 hunk" })
+					vim.keymap.set("n", "<leader>hp", gs.preview_hunk, { buffer = bufnr, desc = "hunk 미리보기" })
+				end,
+			})
+		end,
+	})
+	use({
+		"sindrets/diffview.nvim",
+		after = "plenary.nvim",
+		requires = "nvim-lua/plenary.nvim",
+		config = function()
+			require("diffview").setup({})
+		end,
+	})
+	-- git add -i / amend 등: 터미널 raw 보다 Lazygit TUI가 많이 쓰임 (brew install lazygit 필요)
+	use({
+		"kdheepak/lazygit.nvim",
+		after = "plenary.nvim",
+		requires = "nvim-lua/plenary.nvim",
+	})
+	use({
+		"ellisonleao/gruvbox.nvim",
+		config = function()
+			-- 플러그인 설치·rtp 반영 후에만 적용 (설치 전 colorscheme 에러 방지)
+			if not pcall(vim.cmd, "colorscheme gruvbox") then
+				vim.notify("gruvbox 테마 적용 실패 — :PackerSync 후 재시작", vim.log.levels.WARN)
+			end
+		end,
+	})
 	use("preservim/nerdtree")
 	-- use("numToStr/Comment.nvim")
 	use({"numToStr/Comment.nvim", config = function() 

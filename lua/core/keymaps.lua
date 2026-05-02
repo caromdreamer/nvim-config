@@ -11,6 +11,65 @@ keymap.set("n", "<c-j>", "<c-w>j")
 keymap.set("n", "<leader>e", "<cmd>Telescope find_files<cr>")
 keymap.set("n", "<leader>fs", "<cmd>Telescope live_grep<cr>")
 keymap.set("n", "<leader>fc", "<cmd>Telescope grep_string<cr>")
+-- Git: 변경 파일 목록 / 워킹트리 diff (IDE 소스 제어·diff 뷰에 가깝게)
+-- Diffview는 Ex 명령이 아직 없을 수 있어(설치 전·로드 전) Lua API로 직접 호출
+local function diffview_run(fn)
+	local ok, dv = pcall(require, "diffview")
+	if not ok or dv == nil then
+		vim.notify(
+			"diffview.nvim을 불러올 수 없습니다. Neovim에서 :PackerSync 실행 후 재시작하세요.",
+			vim.log.levels.ERROR
+		)
+		return
+	end
+	fn(dv)
+end
+
+keymap.set("n", "<leader>gs", "<cmd>Telescope git_status<cr>")
+vim.keymap.set("n", "<leader>gv", function()
+	diffview_run(function(dv)
+		dv.open()
+	end)
+end, { desc = "Diffview 워킹트리" })
+vim.keymap.set("n", "<leader>gh", function()
+	diffview_run(function(dv)
+		dv.file_history(nil, { "%" })
+	end)
+end, { desc = "Diffview 현재 파일 히스토리" })
+vim.keymap.set("n", "<leader>gx", function()
+	diffview_run(function(dv)
+		dv.close()
+	end)
+end, { desc = "Diffview 닫기" })
+-- Lazygit: 스테이지·커밋·amend·rebase를 TUI로 (git add -i 대체에 가깝게)
+vim.keymap.set("n", "<leader>gg", "<cmd>LazyGit<CR>", { desc = "LazyGit (cwd)" })
+vim.keymap.set("n", "<leader>gC", "<cmd>LazyGitCurrentFile<CR>", { desc = "LazyGit (현재 파일 git 루트)" })
+-- 한 nvim = 한 레포면 보통 레포 루트에서 nvim만 켜면 됨. cwd만 하위에 멈춘 경우 등에 git 루트로 맞출 때
+local function git_root_of_buffer()
+	local anchor = vim.api.nvim_buf_get_name(0)
+	if anchor == "" then
+		anchor = vim.fn.getcwd()
+	end
+	if vim.fs and vim.fs.root then
+		return vim.fs.root(anchor, ".git")
+	end
+	local dir = vim.fn.isdirectory(anchor) == 1 and anchor or vim.fn.fnamemodify(anchor, ":p:h")
+	local out = vim.fn.systemlist({ "git", "-C", dir, "rev-parse", "--show-toplevel" })
+	if vim.v.shell_error == 0 and out[1] and out[1] ~= "" then
+		return vim.trim(out[1])
+	end
+	return nil
+end
+
+vim.keymap.set("n", "<leader>cd", function()
+	local root = git_root_of_buffer()
+	if root then
+		vim.cmd("cd " .. vim.fn.fnameescape(root))
+		vim.notify("cd → " .. vim.fn.fnamemodify(root, ":~"), vim.log.levels.INFO)
+	else
+		vim.notify("상위에 .git이 없습니다.", vim.log.levels.WARN)
+	end
+end, { desc = "cwd를 git 루트로" })
 keymap.set("n", "8", "<C-u>zz")
 keymap.set("n", "9", "<C-d>zz")
 keymap.set("v", "8", "<C-u>zz")
@@ -23,9 +82,13 @@ vim.keymap.set("n", "<right>", "<c-w>>")
 vim.keymap.set("n", "<down>", "<c-w>-")
 vim.keymap.set("n", "<up>", "<c-w>+")
 
--- terminal
-vim.keymap.set("n", "\\\\", "<cmd>bel sp | resize 10 | terminal<CR>")
-vim.keymap.set("t", "<esc>", "<C-\\><C-N>")
+-- 터미널: toggleterm.nvim — Normal·Terminal 모드 둘 다에서 토글
+-- ,th 하단(가로) · ,tv 오른쪽(세로) · ,tt 플로팅(AI/짧은 작업 등)
+vim.keymap.set({ "n", "t" }, "<leader>th", "<cmd>ToggleTerm direction=horizontal<cr>")
+vim.keymap.set({ "n", "t" }, "<leader>tv", "<cmd>ToggleTerm direction=vertical<cr>")
+vim.keymap.set({ "n", "t" }, "<leader>tt", "<cmd>ToggleTerm direction=float<cr>")
+-- 터미널에서 <Esc>를 매핑하면 Lazygit·fzf·ssh 속 vim 등에 Esc가 전달되지 않음
+-- 터미널 → Normal: Vim 기본 Ctrl-\\ Ctrl-n (또는 Lazygit 닫은 뒤 창 이동은 아래 C-h 등)
 vim.keymap.set("t", "<c-k>", "<C-\\><C-n><c-w>k")
 vim.keymap.set("t", "<c-j>", "<C-\\><C-n><C-w>j")
 
