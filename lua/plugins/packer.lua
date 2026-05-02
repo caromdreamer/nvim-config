@@ -14,7 +14,7 @@ local packer_bootstrap = ensure_packer()
 vim.cmd([[
 augroup packer_user_config
 autocmd!
-autocmd BufWritePost plugin-setup.lua source <afile> | PackerSync
+autocmd BufWritePost packer.lua source <afile> | PackerSync
 augroup end]])
 
 local status, packer = pcall(require, "packer")
@@ -26,10 +26,9 @@ return require("packer").startup(function(use)
 	use("github/copilot.vim")
 	use("wbthomason/packer.nvim")
 	use("neovim/nvim-lspconfig")
-	-- use("hrsh7th/nvim-cmp")
 	use({
 		"hrsh7th/nvim-cmp",
-		config = function() 
+		config = function()
 			local cmp = require("cmp")
 			cmp.setup({
 				snippet = {
@@ -40,8 +39,8 @@ return require("packer").startup(function(use)
 				mapping = {
 					["<C-d>"] = cmp.mapping.scroll_docs(-4),
 					["<C-f>"] = cmp.mapping.scroll_docs(4),
-					["<C-p>"] = cmp.mapping.select_prev_item(), -- previous suggestion
-					["<C-n>"] = cmp.mapping.select_next_item(), -- next suggestion
+					["<C-p>"] = cmp.mapping.select_prev_item(),
+					["<C-n>"] = cmp.mapping.select_next_item(),
 					["<CR>"] = cmp.mapping.confirm({ select = true }),
 				},
 				sources = {
@@ -60,9 +59,12 @@ return require("packer").startup(function(use)
 	use("saadparwaiz1/cmp_luasnip")
 	use("L3MON4D3/LuaSnip")
 	use("rafamadriz/friendly-snippets")
-	use({"nvim-telescope/telescope.nvim", config = function()
-		require("telescope").setup({})
-	end})
+	use({
+		"nvim-telescope/telescope.nvim",
+		config = function()
+			require("telescope").setup({})
+		end,
+	})
 	use("nvim-lua/plenary.nvim")
 	use({
 		"akinsho/toggleterm.nvim",
@@ -84,16 +86,21 @@ return require("packer").startup(function(use)
 			})
 		end,
 	})
-	use({"hoob3rt/lualine.nvim", config = function()
-		-- Lualine
-		require("lualine").setup({
-			options = { theme = "gruvbox" },
-		})
-	end})
-	use({'ray-x/go.nvim', config = function() 
-		vim.api.nvim_exec([[ autocmd BufWritePre *.go :silent! lua require('go.format').gofumpt() ]], false)
-		require('go').setup()
-	end})
+	use({
+		"hoob3rt/lualine.nvim",
+		config = function()
+			require("lualine").setup({
+				options = { theme = "gruvbox" },
+			})
+		end,
+	})
+	use({
+		"ray-x/go.nvim",
+		config = function()
+			vim.api.nvim_exec([[ autocmd BufWritePre *.go :silent! lua require('go.format').gofumpt() ]], false)
+			require("go").setup()
+		end,
+	})
 
 	use({
 		"nvim-treesitter/nvim-treesitter",
@@ -126,7 +133,6 @@ return require("packer").startup(function(use)
 			require("diffview").setup({})
 		end,
 	})
-	-- git add -i / amend 등: 터미널 raw 보다 Lazygit TUI가 많이 쓰임 (brew install lazygit 필요)
 	use({
 		"kdheepak/lazygit.nvim",
 		after = "plenary.nvim",
@@ -135,31 +141,31 @@ return require("packer").startup(function(use)
 	use({
 		"ellisonleao/gruvbox.nvim",
 		config = function()
-			-- 플러그인 설치·rtp 반영 후에만 적용 (설치 전 colorscheme 에러 방지)
 			if not pcall(vim.cmd, "colorscheme gruvbox") then
 				vim.notify("gruvbox 테마 적용 실패 — :PackerSync 후 재시작", vim.log.levels.WARN)
 			end
 		end,
 	})
 	use("preservim/nerdtree")
-	-- use("numToStr/Comment.nvim")
-	use({"numToStr/Comment.nvim", config = function() 
-		local setup, comment = pcall(require, "Comment")
-		if not setup then 
-			return
-		end
-		comment.setup()
-	end})
-
-	use({ "jlanzarotta/bufexplorer", config = function() end })
-	use ({
-		'nvimdev/lspsaga.nvim',
-		after = 'nvim-lspconfig',
+	use({
+		"numToStr/Comment.nvim",
 		config = function()
-			require('lspsaga').setup({})
+			local setup, comment = pcall(require, "Comment")
+			if not setup then
+				return
+			end
+			comment.setup()
 		end,
 	})
-	-- use { 'hsnks100/lspsaga.nvim', branch = 'main'}
+
+	use({ "jlanzarotta/bufexplorer", config = function() end })
+	use({
+		"nvimdev/lspsaga.nvim",
+		after = "nvim-lspconfig",
+		config = function()
+			require("lspsaga").setup({})
+		end,
+	})
 	if packer_bootstrap then
 		require("packer").sync()
 	end

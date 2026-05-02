@@ -26,9 +26,3 @@ vim.api.nvim_create_autocmd({ "FocusGained", "TermLeave", "TermClose" }, {
 		end
 	end,
 })
-
--- vim.cmd([[
---
--- let HlUnderCursor=1
--- autocmd CursorMoved * exe exists("HlUnderCursor")?HlUnderCursor?printf('match IncSearch /\V\<%s\>/', escape(expand('<cword>'), '/\')):'match none':""
--- 	]])

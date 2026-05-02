@@ -90,7 +90,7 @@ vim.keymap.set({ "n", "t" }, "<leader>tt", "<cmd>ToggleTerm direction=float<cr>"
 -- 터미널에서 <Esc>를 매핑하면 Lazygit·fzf·ssh 속 vim 등에 Esc가 전달되지 않음
 -- 터미널 → Normal: Vim 기본 Ctrl-\\ Ctrl-n (또는 Lazygit 닫은 뒤 창 이동은 아래 C-h 등)
 vim.keymap.set("t", "<c-k>", "<C-\\><C-n><c-w>k")
-vim.keymap.set("t", "<c-j>", "<C-\\><C-n><C-w>j")
+vim.keymap.set("t", "<c-j>", "<C-\\><C-n><c-w>j")
 
 
 keymap.set("n", "<leader>to", ":tabnew<CR>")
@@ -101,8 +101,3 @@ keymap.set("n", "<leader>tn", ":tabn<CR>")
 
 vim.opt.mouse = "a"
 vim.opt.updatetime = 1000
--- tnoremap <C-w>j <C-\><C-n><C-w>j
-
--- tnoremap <C-w>k <C-\><C-n><C-w>k
-
-
