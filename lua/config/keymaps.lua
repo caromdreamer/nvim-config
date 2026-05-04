@@ -2,15 +2,21 @@ vim.g.mapleader = ","
 
 local keymap = vim.keymap
 
-keymap.set("n", "<leader>w", "<cmd>BufExplorer<CR>")
-keymap.set("n", "<leader>n", ":NERDTree<CR>")
+keymap.set("n", "<leader>w", "<cmd>BufExplorer<CR>", { desc = "BufExplorer" })
+keymap.set("n", "<leader>n", ":NERDTree<CR>", { desc = "NERDTree" })
 keymap.set("n", "<c-h>", "<c-w>h")
 keymap.set("n", "<c-l>", "<c-w>l")
 keymap.set("n", "<c-k>", "<c-w>k")
 keymap.set("n", "<c-j>", "<c-w>j")
-keymap.set("n", "<leader>e", "<cmd>Telescope find_files<cr>")
-keymap.set("n", "<leader>fs", "<cmd>Telescope live_grep<cr>")
-keymap.set("n", "<leader>fc", "<cmd>Telescope grep_string<cr>")
+keymap.set("n", "<leader>e", "<cmd>Telescope find_files<cr>", { desc = "파일 찾기" })
+keymap.set("n", "<leader>fs", "<cmd>Telescope live_grep<cr>", { desc = "live grep" })
+keymap.set("n", "<leader>fc", "<cmd>Telescope grep_string<cr>", { desc = "커서 단어 grep" })
+keymap.set("n", "<leader>fk", function()
+	require("telescope.builtin").keymaps({ modes = { "n", "i", "c", "x", "v" } })
+end, { desc = "키맵 검색" })
+vim.keymap.set("n", "<leader>?", function()
+	require("which-key").show({ global = false })
+end, { desc = "이 버퍼 키맵(which-key)" })
 -- Git: 변경 파일 목록 / 워킹트리 diff (IDE 소스 제어·diff 뷰에 가깝게)
 -- Diffview는 Ex 명령이 아직 없을 수 있어(설치 전·로드 전) Lua API로 직접 호출
 local function diffview_run(fn)
@@ -25,7 +31,7 @@ local function diffview_run(fn)
 	fn(dv)
 end
 
-keymap.set("n", "<leader>gs", "<cmd>Telescope git_status<cr>")
+keymap.set("n", "<leader>gs", "<cmd>Telescope git_status<cr>", { desc = "git status" })
 vim.keymap.set("n", "<leader>gv", function()
 	diffview_run(function(dv)
 		dv.open()
@@ -74,9 +80,9 @@ keymap.set("n", "8", "<C-u>zz")
 keymap.set("n", "9", "<C-d>zz")
 keymap.set("v", "8", "<C-u>zz")
 keymap.set("v", "9", "<C-d>zz")
-vim.keymap.set("n", "<leader>feR", "<cmd>luafile ~/.config/nvim/init.lua<CR>")
-vim.keymap.set("n", "<leader>fed", "<cmd>e ~/.config/nvim/<CR>")
-vim.keymap.set("n", "<leader>r", "<cmd>cd %:p:h<CR>")
+vim.keymap.set("n", "<leader>feR", "<cmd>luafile ~/.config/nvim/init.lua<CR>", { desc = "init.lua 다시 로드" })
+vim.keymap.set("n", "<leader>fed", "<cmd>e ~/.config/nvim/<CR>", { desc = "설정 폴더 열기" })
+vim.keymap.set("n", "<leader>r", "<cmd>cd %:p:h<CR>", { desc = "cwd → 버퍼 디렉터리" })
 vim.keymap.set("n", "<left>", "<c-w><")
 vim.keymap.set("n", "<right>", "<c-w>>")
 vim.keymap.set("n", "<down>", "<c-w>-")
@@ -84,19 +90,19 @@ vim.keymap.set("n", "<up>", "<c-w>+")
 
 -- 터미널: toggleterm.nvim — Normal·Terminal 모드 둘 다에서 토글
 -- ,th 하단(가로) · ,tv 오른쪽(세로) · ,tt 플로팅(AI/짧은 작업 등)
-vim.keymap.set({ "n", "t" }, "<leader>th", "<cmd>ToggleTerm direction=horizontal<cr>")
-vim.keymap.set({ "n", "t" }, "<leader>tv", "<cmd>ToggleTerm direction=vertical<cr>")
-vim.keymap.set({ "n", "t" }, "<leader>tt", "<cmd>ToggleTerm direction=float<cr>")
+vim.keymap.set({ "n", "t" }, "<leader>th", "<cmd>ToggleTerm direction=horizontal<cr>", { desc = "터미널(가로)" })
+vim.keymap.set({ "n", "t" }, "<leader>tv", "<cmd>ToggleTerm direction=vertical<cr>", { desc = "터미널(세로)" })
+vim.keymap.set({ "n", "t" }, "<leader>tt", "<cmd>ToggleTerm direction=float<cr>", { desc = "터미널(플로트)" })
 -- 터미널에서 <Esc>를 매핑하면 Lazygit·fzf·ssh 속 vim 등에 Esc가 전달되지 않음
 -- 터미널 → Normal: Vim 기본 Ctrl-\\ Ctrl-n (또는 Lazygit 닫은 뒤 창 이동은 아래 C-h 등)
 vim.keymap.set("t", "<c-k>", "<C-\\><C-n><c-w>k")
 vim.keymap.set("t", "<c-j>", "<C-\\><C-n><c-w>j")
 
 
-keymap.set("n", "<leader>to", ":tabnew<CR>")
-keymap.set("n", "<leader>tx", ":tabclose<CR>")
-keymap.set("n", "<leader>tp", ":tabp<CR>")
-keymap.set("n", "<leader>tn", ":tabn<CR>")
+keymap.set("n", "<leader>to", ":tabnew<CR>", { desc = "탭 새로" })
+keymap.set("n", "<leader>tx", ":tabclose<CR>", { desc = "탭 닫기" })
+keymap.set("n", "<leader>tp", ":tabp<CR>", { desc = "이전 탭" })
+keymap.set("n", "<leader>tn", ":tabn<CR>", { desc = "다음 탭" })
 
 
 vim.opt.mouse = "a"

@@ -65,6 +65,21 @@ return require("packer").startup(function(use)
 			require("telescope").setup({})
 		end,
 	})
+	use({
+		"folke/which-key.nvim",
+		config = function()
+			vim.o.timeout = true
+			vim.o.timeoutlen = 400
+			local wk = require("which-key")
+			wk.setup({ preset = "classic" })
+			wk.add({
+				{ "<leader>f", group = "찾기" },
+				{ "<leader>g", group = "git" },
+				{ "<leader>t", group = "터미널·탭" },
+				{ "<leader>fe", group = "Neovim 설정" },
+			})
+		end,
+	})
 	use("nvim-lua/plenary.nvim")
 	use({
 		"akinsho/toggleterm.nvim",
@@ -90,15 +105,22 @@ return require("packer").startup(function(use)
 		"hoob3rt/lualine.nvim",
 		config = function()
 			require("lualine").setup({
-				options = { theme = "gruvbox" },
+				options = { theme = "auto" },
 			})
 		end,
 	})
 	use({
 		"ray-x/go.nvim",
+		-- Neovim 0.11: master(c8a356b~)는 vim.lsp.codelens.enable(0.12 전용) 호출 → InsertLeave 에러. 고정 해제는 NVIM 0.12+ 또는 upstream 수정 후.
+		commit = "7ea962b826ebfce6f0f55c7b4d64c85c658cabe9",
 		config = function()
 			vim.api.nvim_exec([[ autocmd BufWritePre *.go :silent! lua require('go.format').gofumpt() ]], false)
-			require("go").setup()
+			-- lsp_codelens=false만으로는 부족: 레포의 .gonvim/init.lua가 merge되며 true로 덮일 수 있음 → 그때도 끄려면 아래 둘 중 하나
+			-- (1) disable_per_project_cfg=true  (2) .gonvim/init.lua에서 lsp_codelens 제거·false
+			require("go").setup({
+				lsp_codelens = false,
+				disable_per_project_cfg = true,
+			})
 		end,
 	})
 
@@ -109,6 +131,8 @@ return require("packer").startup(function(use)
 			require("nvim-treesitter.configs").setup({
 				highlight = { enable = true },
 				indent = { enable = true },
+				ensure_installed = { "go", "lua", "vim", "vimdoc", "query" },
+				auto_install = true,
 			})
 		end,
 	})
@@ -138,14 +162,9 @@ return require("packer").startup(function(use)
 		after = "plenary.nvim",
 		requires = "nvim-lua/plenary.nvim",
 	})
-	use({
-		"ellisonleao/gruvbox.nvim",
-		config = function()
-			if not pcall(vim.cmd, "colorscheme gruvbox") then
-				vim.notify("gruvbox 테마 적용 실패 — :PackerSync 후 재시작", vim.log.levels.WARN)
-			end
-		end,
-	})
+	use("folke/tokyonight.nvim")
+	use({ "catppuccin/nvim", as = "catppuccin" })
+	use("ellisonleao/gruvbox.nvim")
 	use("preservim/nerdtree")
 	use({
 		"numToStr/Comment.nvim",

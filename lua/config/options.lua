@@ -26,3 +26,21 @@ vim.api.nvim_create_autocmd({ "FocusGained", "TermLeave", "TermClose" }, {
 		end
 	end,
 })
+
+-- IDE에 가까운 자동 저장: Neovim에서도 어렵지 않음 (:w를 언제 칠지 정하는 문제)
+-- 1) 다른 버퍼로 넘어갈 때 등 수정분 기록 (:help 'autowrite')
+opt.autowrite = true
+-- 2) 삽입 모드에서 나올 때 현재 파일만 저장 (scratch·퀵픽 제외). 싫으면 이 블록만 지우면 됨.
+vim.api.nvim_create_autocmd("InsertLeave", {
+	pattern = "*",
+	callback = function()
+		local bo = vim.bo
+		if not bo.modified or not bo.buflisted or bo.buftype ~= "" then
+			return
+		end
+		if vim.api.nvim_buf_get_name(0) == "" then
+			return
+		end
+		vim.cmd({ cmd = "update", mods = { emsg_silent = true } })
+	end,
+})

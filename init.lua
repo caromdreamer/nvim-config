@@ -1,6 +1,8 @@
 require("config.options")
 require("config.keymaps")
 require("config.colorscheme")
+require("config.highlights")
 require("plugins.packer")
+require("config.theme").apply()
 require("config.lsp")
 vim.api.nvim_exec([[ autocmd BufWritePre *.go :lua require('go.format').goimport() ]], false)
