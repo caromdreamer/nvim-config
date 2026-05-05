@@ -77,7 +77,46 @@ return require("packer").startup(function(use)
 				{ "<leader>g", group = "git" },
 				{ "<leader>t", group = "터미널·탭" },
 				{ "<leader>fe", group = "Neovim 설정" },
+				{ "<leader>n", "<cmd>ASToggle<cr>", desc = "자동 저장 토글" },
 			})
+		end,
+	})
+	use({
+		"pocco81/auto-save.nvim",
+		config = function()
+			local autosave = require("auto-save")
+			local conf = require("auto-save.config")
+			autosave.off()
+			autosave.setup({
+				trigger_events = { "InsertLeave", "TextChanged", "BufWinLeave" },
+				debounce_delay = 800,
+				condition = function(buf)
+					local fn = vim.fn
+					if fn.getbufvar(buf, "&modifiable") ~= 1 then
+						return false
+					end
+					if fn.getbufvar(buf, "&buftype") ~= "" then
+						return false
+					end
+					if fn.getbufvar(buf, "&buflisted") ~= 1 then
+						return false
+					end
+					if vim.api.nvim_buf_get_name(buf) == "" then
+						return false
+					end
+					return true
+				end,
+				execution_message = {
+					message = function()
+						return ""
+					end,
+					dim = 0,
+					cleaning_interval = 0,
+				},
+			})
+			if conf.opts.enabled then
+				autosave.on()
+			end
 		end,
 	})
 	use("nvim-lua/plenary.nvim")

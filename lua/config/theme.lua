@@ -7,7 +7,7 @@
 
 local M = {}
 
-M.scheme = "catppuccin"
+M.scheme = "tokyonight"
 
 function M.apply()
 	local s = M.scheme
@@ -16,7 +16,7 @@ function M.apply()
 			style = "storm", -- storm | moon | night | day
 			terminal_colors = true,
 		})
-		vim.cmd.colorscheme("tokyonight")
+		vim.cmd.colorscheme("tokyonight-day")
 	elseif s == "gruvbox" then
 		pcall(require("gruvbox").setup, {
 			contrast = "hard", -- soft | medium | hard
@@ -32,6 +32,8 @@ function M.apply()
 			flavour = "latte", -- latte | frappe | macchiato | mocha
 		})
 		vim.cmd.colorscheme("catppuccin")
+	elseif s == "retrobox" then
+		vim.cmd.colorscheme("retrobox")
 	else
 		vim.notify(("[theme] 알 수 없는 scheme: %s → tokyonight"):format(tostring(s)), vim.log.levels.WARN)
 		require("tokyonight").setup({ style = "storm", terminal_colors = true })
