@@ -167,12 +167,7 @@ return require("packer").startup(function(use)
 		"nvim-treesitter/nvim-treesitter",
 		run = ":TSUpdate",
 		config = function()
-			require("nvim-treesitter.configs").setup({
-				highlight = { enable = true },
-				indent = { enable = true },
-				ensure_installed = { "go", "lua", "vim", "vimdoc", "query" },
-				auto_install = true,
-			})
+			require("nvim-treesitter").setup()
 		end,
 	})
 	use({
