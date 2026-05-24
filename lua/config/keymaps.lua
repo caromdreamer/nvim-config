@@ -3,13 +3,18 @@ vim.g.mapleader = ","
 local keymap = vim.keymap
 
 keymap.set("n", "<leader>w", "<cmd>BufExplorer<CR>", { desc = "BufExplorer" })
-keymap.set("n", "<leader>n", ":NERDTree<CR>", { desc = "NERDTree" })
+keymap.set("n", "<leader>n", "<cmd>Neotree toggle filesystem left reveal<CR>", { desc = "Neo-tree 파일" })
+keymap.set("n", "<leader>nb", "<cmd>Neotree toggle buffers left<CR>", { desc = "Neo-tree 버퍼" })
+keymap.set("n", "<leader>as", "<cmd>ASToggle<CR>", { desc = "자동 저장 토글" })
 keymap.set("n", "<c-h>", "<c-w>h")
 keymap.set("n", "<c-l>", "<c-w>l")
 keymap.set("n", "<c-k>", "<c-w>k")
 keymap.set("n", "<c-j>", "<c-w>j")
 keymap.set("n", "<leader>e", "<cmd>Telescope find_files<cr>", { desc = "파일 찾기" })
-keymap.set("n", "<leader>fs", "<cmd>Telescope live_grep<cr>", { desc = "live grep" })
+-- live_grep 기본은 정규식; 코드 한 줄 통째 검색은 -F 리터럴이 낫다
+keymap.set("n", "<leader>fs", function()
+	require("telescope.builtin").live_grep({ additional_args = { "-F" } })
+end, { desc = "live grep" })
 keymap.set("n", "<leader>fc", "<cmd>Telescope grep_string<cr>", { desc = "커서 단어 grep" })
 keymap.set("n", "<leader>fk", function()
 	require("telescope.builtin").keymaps({ modes = { "n", "i", "c", "x", "v" } })
@@ -31,7 +36,7 @@ local function diffview_run(fn)
 	fn(dv)
 end
 
-keymap.set("n", "<leader>gs", "<cmd>Telescope git_status<cr>", { desc = "git status" })
+keymap.set("n", "<leader>gs", "<cmd>Neotree toggle git_status right<cr>", { desc = "Git 변경 사이드바" })
 vim.keymap.set("n", "<leader>gv", function()
 	diffview_run(function(dv)
 		dv.open()
@@ -47,9 +52,9 @@ vim.keymap.set("n", "<leader>gx", function()
 		dv.close()
 	end)
 end, { desc = "Diffview 닫기" })
--- Lazygit: 스테이지·커밋·amend·rebase를 TUI로 (git add -i 대체에 가깝게)
-vim.keymap.set("n", "<leader>gg", "<cmd>LazyGit<CR>", { desc = "LazyGit (cwd)" })
-vim.keymap.set("n", "<leader>gC", "<cmd>LazyGitCurrentFile<CR>", { desc = "LazyGit (현재 파일 git 루트)" })
+-- Neogit: 에디터 안 소스컨트롤(diffview/telescope 연동). Lazygit은 터미널 외부에서 단독 사용.
+vim.keymap.set("n", "<leader>gg", "<cmd>Neogit<cr>", { desc = "Neogit" })
+vim.keymap.set("n", "<leader>gC", "<cmd>Neogit cwd=%:p:h<cr>", { desc = "Neogit (현재 파일 기준 레포)" })
 -- 한 nvim = 한 레포면 보통 레포 루트에서 nvim만 켜면 됨. cwd만 하위에 멈춘 경우 등에 git 루트로 맞출 때
 local function git_root_of_buffer()
 	local anchor = vim.api.nvim_buf_get_name(0)
@@ -93,8 +98,7 @@ vim.keymap.set("n", "<up>", "<c-w>+")
 vim.keymap.set({ "n", "t" }, "<leader>th", "<cmd>ToggleTerm direction=horizontal<cr>", { desc = "터미널(가로)" })
 vim.keymap.set({ "n", "t" }, "<leader>tv", "<cmd>ToggleTerm direction=vertical<cr>", { desc = "터미널(세로)" })
 vim.keymap.set({ "n", "t" }, "<leader>tt", "<cmd>ToggleTerm direction=float<cr>", { desc = "터미널(플로트)" })
--- 터미널에서 <Esc>를 매핑하면 Lazygit·fzf·ssh 속 vim 등에 Esc가 전달되지 않음
--- 터미널 → Normal: Vim 기본 Ctrl-\\ Ctrl-n (또는 Lazygit 닫은 뒤 창 이동은 아래 C-h 등)
+-- 터미널에서 <Esc>를 매핑하면 일부 TUI(fzf 등)에서 Esc가 전달되지 않음
 vim.keymap.set("t", "<c-k>", "<C-\\><C-n><c-w>k")
 vim.keymap.set("t", "<c-j>", "<C-\\><C-n><c-w>j")
 

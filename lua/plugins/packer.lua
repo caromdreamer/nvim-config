@@ -66,6 +66,48 @@ return require("packer").startup(function(use)
 		end,
 	})
 	use({
+		"nvim-neo-tree/neo-tree.nvim",
+		branch = "v3.x",
+		requires = {
+			"nvim-lua/plenary.nvim",
+			"MunifTanjim/nui.nvim",
+			"nvim-tree/nvim-web-devicons",
+		},
+		config = function()
+			require("neo-tree").setup({
+				close_if_last_window = true,
+				enable_git_status = true,
+				enable_diagnostics = true,
+				open_files_do_not_replace_types = { "terminal", "qf" },
+				window = {
+					position = "left",
+					width = 32,
+				},
+				filesystem = {
+					follow_current_file = {
+						enabled = true,
+						leave_dirs_open = false,
+					},
+					filtered_items = {
+						visible = true,
+						hide_dotfiles = false,
+						hide_gitignored = false,
+					},
+				},
+				git_status = {
+					window = {
+						position = "right",
+						width = 36,
+					},
+				},
+				source_selector = {
+					winbar = true,
+					statusline = false,
+				},
+			})
+		end,
+	})
+	use({
 		"folke/which-key.nvim",
 		config = function()
 			vim.o.timeout = true
@@ -75,9 +117,10 @@ return require("packer").startup(function(use)
 			wk.add({
 				{ "<leader>f", group = "찾기" },
 				{ "<leader>g", group = "git" },
+				{ "<leader>a", group = "자동화" },
+				{ "<leader>n", group = "neo-tree" },
 				{ "<leader>t", group = "터미널·탭" },
 				{ "<leader>fe", group = "Neovim 설정" },
-				{ "<leader>n", "<cmd>ASToggle<cr>", desc = "자동 저장 토글" },
 			})
 		end,
 	})
@@ -191,15 +234,22 @@ return require("packer").startup(function(use)
 			require("diffview").setup({})
 		end,
 	})
+	-- 버퍼·일반.nvim 동작으로 스테이징·디프·커밋(Magit 느낌). 외부 TUI Lazygit와 병행 가능.
 	use({
-		"kdheepak/lazygit.nvim",
-		after = "plenary.nvim",
+		"NeogitOrg/neogit",
 		requires = "nvim-lua/plenary.nvim",
+		config = function()
+			require("neogit").setup({
+				integrations = {
+					diffview = true,
+					telescope = true,
+				},
+			})
+		end,
 	})
 	use("folke/tokyonight.nvim")
 	use({ "catppuccin/nvim", as = "catppuccin" })
 	use("ellisonleao/gruvbox.nvim")
-	use("preservim/nerdtree")
 	use({
 		"numToStr/Comment.nvim",
 		config = function()
