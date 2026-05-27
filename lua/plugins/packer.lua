@@ -202,6 +202,7 @@ return require("packer").startup(function(use)
 			require("go").setup({
 				lsp_codelens = false,
 				disable_per_project_cfg = true,
+				lsp_semantic_highlights = true,
 			})
 		end,
 	})
@@ -211,6 +212,14 @@ return require("packer").startup(function(use)
 		run = ":TSUpdate",
 		config = function()
 			require("nvim-treesitter").setup()
+			require("nvim-treesitter.configs").setup({
+				highlight = {
+					enable = true,
+					additional_vim_regex_highlighting = false,
+				},
+				ensure_installed = { "go", "gomod", "gowork", "lua", "vim", "vimdoc", "query" },
+				auto_install = true,
+			})
 		end,
 	})
 	use({

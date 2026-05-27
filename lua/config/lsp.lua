@@ -91,7 +91,7 @@ end
 
 local capabilities = require("cmp_nvim_lsp").default_capabilities()
 
-local on_attach = function(_, bufnr)
+local on_attach = function(_client, bufnr)
 	local opts = { noremap = true, silent = true }
 	local buf_set_keymap = vim.api.nvim_buf_set_keymap
 
